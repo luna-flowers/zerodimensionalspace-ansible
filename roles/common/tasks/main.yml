@@ -1,0 +1,37 @@
+---
+# This playbook deploys a zerodimensional.space template website
+- name: Enable Caddy Repo
+  community.general.copr:
+    name: '@caddy/caddy'
+    state: enabled
+    chroot: epel-8-x86_64
+
+- name: Install Caddy
+  ansible.builtin.dnf:
+    name: caddy
+    state: present
+
+- name: Setup Caddyfile
+  ansible.builtin.copy:
+    src: ../files/Caddyfile
+    dest: /etc/caddy/Caddyfile
+    mode: '0644'
+  
+- name: Serve Root Files
+  ansible.builtin.copy:
+    src: ../files/zerodimensional.space
+    dest: /var/www/html/
+    mode: '0644'    
+  
+- name: Serve Subdomain Files
+  ansible.builtin.copy:
+    src: ../files/royalmooncakes.zerodimensional.space
+    dest: /var/www/html/
+    mode: '0644'
+  
+- name: Enable Caddy
+  ansible.builtin.systemd: 
+    name: caddy
+    state: started
+    daemon_reload: yes
+    enabled: yes
